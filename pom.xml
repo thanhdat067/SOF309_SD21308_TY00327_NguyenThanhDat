@@ -42,6 +42,95 @@
         </dependency>
 
         <!-- (Tùy chọn) Web Server & DB cũ của sinh viên có thể dán thêm vào đây -->
+
+        <!-- ============================================== -->
+        <!-- Microsoft SQL Server JDBC Driver              -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>12.4.2.jre11</version>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- jBCrypt - Password Hashing                    -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- Jakarta Servlet API (Tomcat 10+)              -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- Jakarta Server Pages API (JSP)                -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>3.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- Jakarta JSTL (JSP Standard Tag Library)       -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>jakarta.servlet.jsp.jstl</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- JetBrains Annotations (@NotNull, @Nullable)   -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.1.0</version>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- [Y4 - P2] TESTNG TESTING FRAMEWORK            -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.9.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- Commons IO (File utility for screenshots)     -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.16.1</version>
+        </dependency>
+
+        <!-- ============================================== -->
+        <!-- JavaMail API (javax.mail)                     -->
+        <!-- ============================================== -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
     </dependencies>
 
     <build>

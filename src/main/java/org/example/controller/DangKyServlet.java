@@ -70,7 +70,10 @@ public class DangKyServlet extends HttpServlet {
         try {
             EmailUtil.sendEmail(email, "[OTP từ HNDD Application]", "OTP của bạn là: " + otp);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            req.setAttribute("loi", "Không thể gửi email OTP. Vui lòng kiểm tra cấu hình email hoặc thử lại sau!");
+            req.getRequestDispatcher("/dangky.jsp").forward(req, resp);
+            return;
         }
 
         String mahoaMK = BCrypt.hashpw(password, BCrypt.gensalt(12));

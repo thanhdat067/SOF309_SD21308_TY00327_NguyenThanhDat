@@ -61,9 +61,14 @@ public class NhanOTPServlet extends HttpServlet {
                 }
             } else {
                 AccountDAO dao = new AccountDAOImpl();
-                dao.dangKy(username, password, name, phone, email, role);
-                req.getSession().invalidate();
-                resp.sendRedirect(req.getContextPath() + "/dangnhap?message=registerSuccess");
+                Boolean ketQua = dao.dangKy(username, password, name, phone, email, role);
+                if (Boolean.TRUE.equals(ketQua)) {
+                    req.getSession().invalidate();
+                    resp.sendRedirect(req.getContextPath() + "/dangnhap?message=registerSuccess");
+                } else {
+                    req.setAttribute("loi", "Có lỗi xảy ra khi tạo tài khoản (kết nối cơ sở dữ liệu thất bại). Vui lòng thử lại!");
+                    req.getRequestDispatcher("/nhanOTP.jsp").forward(req, resp);
+                }
             }
         } else {
             req.setAttribute("loi", "OTP không khớp!");

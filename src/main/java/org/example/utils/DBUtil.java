@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBUtil {
-    private static final String URL = env("DB_URL", "jdbc:sqlserver://localhost:1433;databaseName=QLBida5;encrypt=true;trustServerCertificate=true;");
+    private static final String URL = env("DB_URL", "jdbc:sqlserver://localhost:1433;databaseName=QLBida5;encrypt=true;trustServerCertificate=true;loginTimeout=5;");
     private static final String USER = env("DB_USER", "sa");
-    private static final String PASSWORD = env("DB_PASSWORD", "");
+    private static final String PASSWORD = env("DB_PASSWORD", "123456");
     private static String env(String k, String d) { String v = System.getenv(k); return v == null ? d : v; }
 
     private static boolean migrated = false;
@@ -64,7 +64,6 @@ public class DBUtil {
                     try {
                         stmt.execute("ALTER TABLE " + tbl + " ADD is_deleted BIT NOT NULL DEFAULT 0");
                     } catch (Exception ex) {
-                        // In case of case sensitivity or other issues, try uppercase/lowercase TableType
                         if ("tabletype".equals(tbl)) {
                             try {
                                 stmt.execute("ALTER TABLE TableType ADD is_deleted BIT NOT NULL DEFAULT 0");
@@ -110,81 +109,29 @@ public class DBUtil {
                 stmt.execute("ALTER TABLE Bill ADD member_id INT NULL");
             }
 
-            // 5. Create Matchmaking table if not exists
-            boolean hasMatchmaking = false;
-            try (java.sql.ResultSet rs = connection.getMetaData().getTables(null, null, "Matchmaking", null)) {
+            // 5. Add discount_amount to Bill table if not exists
+            boolean hasDiscountAmount = false;
+            try (java.sql.ResultSet rs = connection.getMetaData().getColumns(null, null, "Bill", "discount_amount")) {
                 if (rs.next()) {
-                    hasMatchmaking = true;
+                    hasDiscountAmount = true;
                 }
             }
-            if (!hasMatchmaking) {
-                stmt.execute("CREATE TABLE Matchmaking (" +
-                             "id INT IDENTITY(1,1) PRIMARY KEY, " +
-                             "account_id INT NOT NULL, " +
-                             "play_type NVARCHAR(100) NOT NULL, " +
-                             "play_time DATETIME NOT NULL, " +
-                             "note NVARCHAR(500) NULL, " +
-                             "status NVARCHAR(50) NOT NULL DEFAULT 'Waiting', " +
-                             "partner_id INT NULL, " +
-                             "created_at DATETIME NOT NULL DEFAULT GETDATE(), " +
-                             "FOREIGN KEY (account_id) REFERENCES Account(id), " +
-                             "FOREIGN KEY (partner_id) REFERENCES Account(id))");
+            if (!hasDiscountAmount) {
+                stmt.execute("ALTER TABLE Bill ADD discount_amount DECIMAL(18, 2) NOT NULL DEFAULT 0");
             }
 
-            // 6. Add member_rank and playing_style to Account table if not exists
-            boolean hasMemberRank = false;
-            boolean hasPlayingStyle = false;
-            try (java.sql.ResultSet rs = connection.getMetaData().getColumns(null, null, "Account", null)) {
-                while (rs.next()) {
-                    String col = rs.getString("COLUMN_NAME");
-                    if ("member_rank".equalsIgnoreCase(col)) {
-                        hasMemberRank = true;
-                    }
-                    if ("playing_style".equalsIgnoreCase(col)) {
-                        hasPlayingStyle = true;
-                    }
-                }
-            }
-            if (!hasMemberRank) {
-                stmt.execute("ALTER TABLE Account ADD member_rank NVARCHAR(100) NULL DEFAULT N'Nghiệp dư'");
-            }
-            if (!hasPlayingStyle) {
-                stmt.execute("ALTER TABLE Account ADD playing_style NVARCHAR(250) NULL DEFAULT N'Chưa cập nhật'");
-            }
-
-            // 7. Create Locker table if not exists
-            boolean hasLocker = false;
-            try (java.sql.ResultSet rs = connection.getMetaData().getTables(null, null, "Locker", null)) {
+            // 6. Add is_deleted to Bill table if not exists
+            boolean hasBillDeleted = false;
+            try (java.sql.ResultSet rs = connection.getMetaData().getColumns(null, null, "Bill", "is_deleted")) {
                 if (rs.next()) {
-                    hasLocker = true;
+                    hasBillDeleted = true;
                 }
             }
-            if (!hasLocker) {
-                stmt.execute("CREATE TABLE Locker (" +
-                             "id INT IDENTITY(1,1) PRIMARY KEY, " +
-                             "locker_number NVARCHAR(100) NOT NULL UNIQUE, " +
-                             "status NVARCHAR(50) NOT NULL DEFAULT 'Available', " +
-                             "member_id INT NULL, " +
-                             "start_date DATETIME NULL, " +
-                             "end_date DATETIME NULL, " +
-                             "price DECIMAL(18,2) NOT NULL DEFAULT 0.0, " +
-                             "note NVARCHAR(500) NULL, " +
-                             "is_deleted BIT NOT NULL DEFAULT 0, " +
-                             "FOREIGN KEY (member_id) REFERENCES Account(id))");
+            if (!hasBillDeleted) {
+                stmt.execute("ALTER TABLE Bill ADD is_deleted BIT NOT NULL DEFAULT 0");
             }
 
-            // 7.1 Add customer_name to Locker table if not exists (for walk-in / non-member rentals)
-            boolean hasCustomerName = false;
-            try (java.sql.ResultSet rs = connection.getMetaData().getColumns(null, null, "Locker", "customer_name")) {
-                if (rs.next()) {
-                    hasCustomerName = true;
-                }
-            }
-            if (!hasCustomerName) {
-                stmt.execute("ALTER TABLE Locker ADD customer_name NVARCHAR(200) NULL");
-            }
-
-            // 7.2 Add is_deleted to Booking table if not exists
+            // 7. Add is_deleted to Booking table if not exists
             boolean hasBookingDeleted = false;
             try (java.sql.ResultSet rs = connection.getMetaData().getColumns(null, null, "Booking", "is_deleted")) {
                 if (rs.next()) {
@@ -284,9 +231,9 @@ public class DBUtil {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (ClassNotFoundException | SQLException e) {
+            System.err.println("[DBUtil] Loi ket noi DB (" + URL + ", user=" + USER + "): " + e.getMessage());
             e.printStackTrace();
         }
         return connection;
     }
 }
-

@@ -41,7 +41,7 @@ public class AccountDAOImpl implements AccountDAO {
     @Override
     public Boolean daTonTaiUserName(String username) {
         try {
-            String sql = "SELECT * FROM Account WHERE username = ?";
+            String sql = "SELECT * FROM Account WHERE username = ? AND is_deleted = 0";
 
             Connection con = DBUtil.getConnection();
             PreparedStatement pst = con.prepareStatement(sql);
